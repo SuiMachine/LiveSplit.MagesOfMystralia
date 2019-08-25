@@ -117,7 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="label3.Text" xml:space="preserve">
-    <value>- In version 1.0.2 (and lower) signature scan fails to find anything, until new game is started. Make sure to start the new game at least once before starting a new run, due to how long it takes for the scan process to complete!</value>
-  </data>
 </root>

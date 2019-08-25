@@ -15,7 +15,7 @@ namespace LiveSplit.MagesOfMystralia
 
         public event EventHandler OnLoadStarted;
         public event EventHandler OnLoadFinished;
-        public event EventHandler OnLevelChanged;
+        //public event EventHandler OnLevelChanged;
         public event EventHandler OnFirstLevelLoad;
 
         private Task _thread;
@@ -24,22 +24,21 @@ namespace LiveSplit.MagesOfMystralia
         private List<int> _ignorePIDs;
         private MagesOfMystraliaSettings _settings;
 
-        IntPtr UILoadingScreenPointer = IntPtr.Zero;
-        IntPtr originalShowLoadFunctionAddress = IntPtr.Zero;
-        IntPtr codeDetour = IntPtr.Zero;
+        IntPtr currentIsPausedAddress = IntPtr.Zero;
 
-        private byte[] OriginalInstructionBytesShowLoad = new byte[] {
-            0x55,
-            0x48, 0x8B, 0xEC,
-            0x56,
-            0x41, 0x57,
-            0x48, 0x83, 0xEC, 0x10,
-            0x48, 0x8B, 0xF1,
-            0x48, 0x8B, 0x46, 0x38,
-            0x48, 0x8B, 0xC8,
-            0x33, 0xD2,
-            0x48, 0x83, 0xEC, 0x20
-        };
+        string SigScanPattern_InventoryStatusUpdateCurrentTimePlayed =
+            "55 " +
+            "48 8B EC " +
+            "48 83 EC 10 " +
+            "B8 ?? ?? ?? ?? " +
+            "48 0F B6 00 " +
+            "85 C0 " +
+            "0F 84 ?? ?? ?? ?? " +
+            "B8 ?? ?? ?? ?? " +
+            "F3 0F 10 00 " +
+            "F3 0F 5A C0 " +
+            "F2 0F 5A E8 " +
+            "F3 0F 11 6D FC";
 
         public GameMemory(MagesOfMystraliaSettings componentSettings)
         {
@@ -70,17 +69,6 @@ namespace LiveSplit.MagesOfMystralia
                 return;
             }
 
-            if(originalShowLoadFunctionAddress != IntPtr.Zero && game != null && !game.HasExited && isLevelSystemHooked)
-            {
-                Debug.WriteLine("[NOLOADS] Restoring original function.");
-                game.Suspend();
-                game.WriteBytes(originalShowLoadFunctionAddress, OriginalInstructionBytesShowLoad);
-                game.FreeMemory(codeDetour);
-                game.FreeMemory(UILoadingScreenPointer);
-                game.Resume();
-
-            }
-
             _cancelSource.Cancel();
             _thread.Wait();
 
@@ -88,11 +76,8 @@ namespace LiveSplit.MagesOfMystralia
         }
 
         int failedScansCount = 0;
-        bool isLevelSystemHooked = false;
         bool isLoading = false;
         bool prevIsLoading = false;
-        int currentLevelID = 0;
-        int prevLevelId = 0;
         bool loadingStarted = false;
 
         //Used in displaying status in Settings
@@ -102,8 +87,7 @@ namespace LiveSplit.MagesOfMystralia
             FoundProcessWaiting,
             Scanning,
             FailedScanning,
-            FailedToInject,
-            Injected
+            Found
         }
 
         InjectionStatus lastInjectionStatus = InjectionStatus.NoProcess;
@@ -155,7 +139,7 @@ namespace LiveSplit.MagesOfMystralia
 
                     while (!game.HasExited)
                     {
-                        if (!isLevelSystemHooked)
+                        if (currentIsPausedAddress == IntPtr.Zero)
                         {
                             #region Hooking
                             if (_settings.RescansLimit != 0 && failedScansCount >= _settings.RescansLimit)
@@ -176,63 +160,32 @@ namespace LiveSplit.MagesOfMystralia
                             else if (game.UserProcessorTime >= TimeSpan.FromSeconds(15))
                             {
                                 SetInjectionLabelInSettings(InjectionStatus.Scanning, IntPtr.Zero);
-                                var contentOfAShowLoadHook = new List<byte>();
-                                var contentOfAHideLoadHook = new List<byte>();
-                                UILoadingScreenPointer = game.AllocateMemory(IntPtr.Size);
 
-                                var sigScanTarget = new SigScanTarget(OriginalInstructionBytesShowLoad);
+                                var sigScanTarget = new SigScanTarget(SigScanPattern_InventoryStatusUpdateCurrentTimePlayed);
+                                IntPtr StartOfUpdateCurrentTime = IntPtr.Zero;
 
-                                Debug.WriteLine("[NOLOADS] injectedPtrForLevelSystemPtr allocated at: " + UILoadingScreenPointer.ToString("X8"));
-                                var injectedPtrForLevelSystemBytes = BitConverter.GetBytes(UILoadingScreenPointer.ToInt64());
-
-                                originalShowLoadFunctionAddress = IntPtr.Zero;
-                                contentOfAShowLoadHook.AddRange(new byte[] { 0x48, 0xB8 });         //mov rax,....
-                                contentOfAShowLoadHook.AddRange(injectedPtrForLevelSystemBytes);    //address for rax^^
-                                contentOfAShowLoadHook.AddRange(new byte[] { 0x48, 0x89, 0x08 });  //mov [rax], rcx
-                                contentOfAShowLoadHook.AddRange(OriginalInstructionBytesShowLoad);
-                                contentOfAShowLoadHook.AddRange(new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }); //14 nops for jmp back (actually needs I think 2 less)
-
-                                Debug.WriteLine("[NOLOADS] Scanning for signature (UILoadingScreen)");
+                                Debug.WriteLine("[NOLOADS] Scanning for signature (InventoryStats:UpdateCurrentTimePlayed)");
                                 foreach (var page in game.MemoryPages())
                                 {
                                     var scanner = new SignatureScanner(game, page.BaseAddress, (int)page.RegionSize);
-                                    if ((originalShowLoadFunctionAddress = scanner.Scan(sigScanTarget)) != IntPtr.Zero)
+                                    if ((StartOfUpdateCurrentTime = scanner.Scan(sigScanTarget)) != IntPtr.Zero)
                                     {
                                         break;
                                     }
                                 }
 
 
-                                if (originalShowLoadFunctionAddress == IntPtr.Zero)
+                                if (StartOfUpdateCurrentTime == IntPtr.Zero)
                                 {
                                     failedScansCount++;
                                     Debug.WriteLine("[NOLOADS] Failed scans: " + failedScansCount);
-                                    game.FreeMemory(UILoadingScreenPointer);
                                 }
                                 else
                                 {
-                                    Debug.WriteLine("[NOLOADS] FOUND SIGNATURE FOR LOADSHOW AT: 0x" + originalShowLoadFunctionAddress.ToString("X8"));
+                                    currentIsPausedAddress = StartOfUpdateCurrentTime + 0x9;
+                                    Debug.WriteLine("[NOLOADS] FOUND SIGNATURE FOR _isPaused AT: 0x" + currentIsPausedAddress.ToString("X8"));
 
-                                    codeDetour = game.AllocateMemory(contentOfAShowLoadHook.Count);
-                                    game.Suspend();
-
-                                    try
-                                    {
-                                        var oInitPtr = game.WriteBytes(codeDetour, contentOfAShowLoadHook.ToArray());
-                                        var detourInstalled = game.WriteDetour(originalShowLoadFunctionAddress, OriginalInstructionBytesShowLoad.Length, codeDetour);
-                                        var returnInstalled = game.WriteJumpInstruction(codeDetour + contentOfAShowLoadHook.Count - 15, originalShowLoadFunctionAddress + 14);
-                                        isLevelSystemHooked = true;
-                                        SetInjectionLabelInSettings(InjectionStatus.Injected, UILoadingScreenPointer);
-                                    }
-                                    catch
-                                    {
-                                        SetInjectionLabelInSettings(InjectionStatus.FailedToInject, IntPtr.Zero);
-                                        throw;
-                                    }
-                                    finally
-                                    {
-                                        game.Resume();
-                                    }
+                                    SetInjectionLabelInSettings(InjectionStatus.Found, currentIsPausedAddress);
                                 }
                             }
                             else
@@ -241,21 +194,12 @@ namespace LiveSplit.MagesOfMystralia
                         }
                         else
                         {
-                            var currentPointerDepth0 = game.ReadPointer(UILoadingScreenPointer);
-                            var currentPointerDepth1 = game.ReadPointer(game.ReadPointer(UILoadingScreenPointer) + 0x28);
+                            var addy = new IntPtr(game.ReadValue<int>(currentIsPausedAddress));
+                            isLoading = game.ReadValue<byte>(addy) == 0;
 
-                            currentLevelID = game.ReadValue<int>(game.ReadPointer(game.ReadPointer(UILoadingScreenPointer) + 0x28) +0x48);
-                            byte wtf = game.ReadValue<byte>(game.ReadPointer(game.ReadPointer(game.ReadPointer(game.ReadPointer(UILoadingScreenPointer) + 0x28) +0x20) +0x98) +0x14);
-                            isLoading = wtf != 0;
-
-                            if (isLoading != prevIsLoading || currentLevelID != prevLevelId)
+                            if (isLoading != prevIsLoading)
                             {
-#if DEBUG
-                                if (currentLevelID != prevLevelId)
-                                    Debug.WriteLine("Level changed from " + prevLevelId + " -> " + currentLevelID);
-#endif
-
-                                if (isLoading || (currentLevelID == 90))
+                                if (isLoading)
                                 {
                                     Debug.WriteLine(String.Format("[NoLoads] Load Start - {0}", frameCounter));
 
@@ -296,21 +240,9 @@ namespace LiveSplit.MagesOfMystralia
                                         }, null);
                                     }
                                 }
-
-                                if (currentLevelID != prevLevelId && currentLevelID != 90 && prevLevelId != 90 )
-                                {
-                                    _uiThread.Post(d =>
-                                    {
-                                        if (OnLevelChanged != null)
-                                        {
-                                            OnLevelChanged(this, EventArgs.Empty);
-                                        }
-                                    }, null);
-                                }
                             }
 
                             prevIsLoading = isLoading;
-                            prevLevelId = currentLevelID;
                             frameCounter++;
 
                             Thread.Sleep(15);
@@ -348,11 +280,9 @@ namespace LiveSplit.MagesOfMystralia
 
             if (game == null)
             {
-                UILoadingScreenPointer = IntPtr.Zero;
-                originalShowLoadFunctionAddress = IntPtr.Zero;
+                currentIsPausedAddress = IntPtr.Zero;
 
                 failedScansCount = 0;
-                isLevelSystemHooked = false;
                 return null;
             }
 
@@ -397,13 +327,9 @@ namespace LiveSplit.MagesOfMystralia
                             _settings.L_InjectionStatus.ForeColor = System.Drawing.Color.Red;
                             _settings.L_InjectionStatus.Text = "Scan failed!";
                             break;
-                        case (InjectionStatus.FailedToInject):
-                            _settings.L_InjectionStatus.ForeColor = System.Drawing.Color.Red;
-                            _settings.L_InjectionStatus.Text = "Failed to inject code!";
-                            break;
-                        case (InjectionStatus.Injected):
+                        case (InjectionStatus.Found):
                             _settings.L_InjectionStatus.ForeColor = System.Drawing.Color.Green;
-                            _settings.L_InjectionStatus.Text = "Successfully injected code. Ptr copy at: 0x" + injectedPointer.ToString("X8");
+                            _settings.L_InjectionStatus.Text = "Successfully found adress at: 0x" + injectedPointer.ToString("X8");
                             break;
                     }
 

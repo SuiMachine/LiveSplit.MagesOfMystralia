@@ -1,4 +1,12 @@
 <updates>
+	<update version="0.2.0">
+		<files>
+			<file path="Components/LiveSplit.MagesOfMystralia.dll" status="changed"/>
+		</files>
+		<changelog>
+			<change>Replaced scan signature with one describing InventoryStats::UpdateCurrentTimePlayed (no injection required).</change>
+		</changelog>
+	</update>
 	<update version="0.1.0">
 		<files>
 			<file path="Components/LiveSplit.MagesOfMystralia.dll" status="changed"/>

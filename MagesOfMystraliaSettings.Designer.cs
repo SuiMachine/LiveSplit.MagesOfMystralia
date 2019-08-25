@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MagesOfMystraliaSettings));
             this.gbStartSplits = new System.Windows.Forms.GroupBox();
             this.CB_Autostart_on_LevelLoad = new System.Windows.Forms.CheckBox();
             this.NumUpDn_RescansLimit = new System.Windows.Forms.NumericUpDown();
@@ -36,9 +35,9 @@
             this.CB_SplitOnLevelChange = new System.Windows.Forms.CheckBox();
             this.tlpMain = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.L_InjectionStatus = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.L_InjectionStatus = new System.Windows.Forms.Label();
             this.gbStartSplits.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NumUpDn_RescansLimit)).BeginInit();
             this.tlpMain.SuspendLayout();
@@ -63,6 +62,7 @@
             // CB_Autostart_on_LevelLoad
             // 
             this.CB_Autostart_on_LevelLoad.AutoSize = true;
+            this.CB_Autostart_on_LevelLoad.Enabled = false;
             this.CB_Autostart_on_LevelLoad.Location = new System.Drawing.Point(6, 19);
             this.CB_Autostart_on_LevelLoad.Name = "CB_Autostart_on_LevelLoad";
             this.CB_Autostart_on_LevelLoad.Size = new System.Drawing.Size(131, 17);
@@ -90,6 +90,7 @@
             // CB_SplitOnLevelChange
             // 
             this.CB_SplitOnLevelChange.AutoSize = true;
+            this.CB_SplitOnLevelChange.Enabled = false;
             this.CB_SplitOnLevelChange.Location = new System.Drawing.Point(6, 42);
             this.CB_SplitOnLevelChange.Name = "CB_SplitOnLevelChange";
             this.CB_SplitOnLevelChange.Size = new System.Drawing.Size(130, 17);
@@ -122,7 +123,18 @@
             this.groupBox1.Size = new System.Drawing.Size(470, 82);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Injection status (for debugging):";
+            this.groupBox1.Text = "Scan status (for debugging):";
+            // 
+            // L_InjectionStatus
+            // 
+            this.L_InjectionStatus.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.L_InjectionStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.L_InjectionStatus.Location = new System.Drawing.Point(3, 16);
+            this.L_InjectionStatus.Name = "L_InjectionStatus";
+            this.L_InjectionStatus.Size = new System.Drawing.Size(464, 63);
+            this.L_InjectionStatus.TabIndex = 0;
+            this.L_InjectionStatus.Text = "INJ";
+            this.L_InjectionStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // groupBox2
             // 
@@ -141,18 +153,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(464, 44);
             this.label3.TabIndex = 0;
-            this.label3.Text = resources.GetString("label3.Text");
-            // 
-            // L_InjectionStatus
-            // 
-            this.L_InjectionStatus.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.L_InjectionStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.L_InjectionStatus.Location = new System.Drawing.Point(3, 16);
-            this.L_InjectionStatus.Name = "L_InjectionStatus";
-            this.L_InjectionStatus.Size = new System.Drawing.Size(464, 63);
-            this.L_InjectionStatus.TabIndex = 0;
-            this.L_InjectionStatus.Text = "INJ";
-            this.L_InjectionStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label3.Text = "- For the scan to finish, a function has to be invokved at least once!";
             // 
             // MagesOfMystraliaSettings
             // 

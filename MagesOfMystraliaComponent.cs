@@ -42,7 +42,7 @@ namespace LiveSplit.MagesOfMystralia
             _gameMemory.OnFirstLevelLoad += gameMemory_OnFirstLevelLoaded;
             _gameMemory.OnLoadStarted += gameMemory_OnLoadStarted;
             _gameMemory.OnLoadFinished += gameMemory_OnLoadFinished;
-            _gameMemory.OnLevelChanged += gameMemory_OnLevelChanged;
+            //_gameMemory.OnLevelChanged += gameMemory_OnLevelChanged;
             state.OnStart += State_OnStart;
             _gameMemory.StartMonitoring();
         }
