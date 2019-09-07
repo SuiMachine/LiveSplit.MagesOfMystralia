@@ -32,7 +32,6 @@
             this.CB_Autostart_on_LevelLoad = new System.Windows.Forms.CheckBox();
             this.NumUpDn_RescansLimit = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.CB_SplitOnLevelChange = new System.Windows.Forms.CheckBox();
             this.tlpMain = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.L_InjectionStatus = new System.Windows.Forms.Label();
@@ -50,11 +49,10 @@
             this.gbStartSplits.Controls.Add(this.CB_Autostart_on_LevelLoad);
             this.gbStartSplits.Controls.Add(this.NumUpDn_RescansLimit);
             this.gbStartSplits.Controls.Add(this.label1);
-            this.gbStartSplits.Controls.Add(this.CB_SplitOnLevelChange);
             this.gbStartSplits.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gbStartSplits.Location = new System.Drawing.Point(3, 3);
             this.gbStartSplits.Name = "gbStartSplits";
-            this.gbStartSplits.Size = new System.Drawing.Size(470, 69);
+            this.gbStartSplits.Size = new System.Drawing.Size(470, 44);
             this.gbStartSplits.TabIndex = 5;
             this.gbStartSplits.TabStop = false;
             this.gbStartSplits.Text = "Options";
@@ -62,7 +60,6 @@
             // CB_Autostart_on_LevelLoad
             // 
             this.CB_Autostart_on_LevelLoad.AutoSize = true;
-            this.CB_Autostart_on_LevelLoad.Enabled = false;
             this.CB_Autostart_on_LevelLoad.Location = new System.Drawing.Point(6, 19);
             this.CB_Autostart_on_LevelLoad.Name = "CB_Autostart_on_LevelLoad";
             this.CB_Autostart_on_LevelLoad.Size = new System.Drawing.Size(131, 17);
@@ -87,17 +84,6 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "Rescans limit:";
             // 
-            // CB_SplitOnLevelChange
-            // 
-            this.CB_SplitOnLevelChange.AutoSize = true;
-            this.CB_SplitOnLevelChange.Enabled = false;
-            this.CB_SplitOnLevelChange.Location = new System.Drawing.Point(6, 42);
-            this.CB_SplitOnLevelChange.Name = "CB_SplitOnLevelChange";
-            this.CB_SplitOnLevelChange.Size = new System.Drawing.Size(130, 17);
-            this.CB_SplitOnLevelChange.TabIndex = 0;
-            this.CB_SplitOnLevelChange.Text = "Split on Level Change";
-            this.CB_SplitOnLevelChange.UseVisualStyleBackColor = true;
-            // 
             // tlpMain
             // 
             this.tlpMain.ColumnCount = 1;
@@ -111,14 +97,14 @@
             this.tlpMain.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 88F));
             this.tlpMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 33F));
-            this.tlpMain.Size = new System.Drawing.Size(476, 275);
+            this.tlpMain.Size = new System.Drawing.Size(476, 195);
             this.tlpMain.TabIndex = 0;
             // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.L_InjectionStatus);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox1.Location = new System.Drawing.Point(3, 78);
+            this.groupBox1.Location = new System.Drawing.Point(3, 53);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(470, 82);
             this.groupBox1.TabIndex = 6;
@@ -139,9 +125,9 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Location = new System.Drawing.Point(3, 166);
+            this.groupBox2.Location = new System.Drawing.Point(3, 141);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(470, 63);
+            this.groupBox2.Size = new System.Drawing.Size(470, 45);
             this.groupBox2.TabIndex = 7;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Notes / Known issues:";
@@ -151,7 +137,7 @@
             this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label3.Location = new System.Drawing.Point(3, 16);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(464, 44);
+            this.label3.Size = new System.Drawing.Size(464, 26);
             this.label3.TabIndex = 0;
             this.label3.Text = "- For the scan to finish, a function has to be invokved at least once!";
             // 
@@ -161,7 +147,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tlpMain);
             this.Name = "MagesOfMystraliaSettings";
-            this.Size = new System.Drawing.Size(476, 382);
+            this.Size = new System.Drawing.Size(476, 203);
             this.gbStartSplits.ResumeLayout(false);
             this.gbStartSplits.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NumUpDn_RescansLimit)).EndInit();
@@ -176,7 +162,6 @@
 
         private System.Windows.Forms.GroupBox gbStartSplits;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.CheckBox CB_SplitOnLevelChange;
         private System.Windows.Forms.TableLayoutPanel tlpMain;
         private System.Windows.Forms.NumericUpDown NumUpDn_RescansLimit;
         private System.Windows.Forms.CheckBox CB_Autostart_on_LevelLoad;

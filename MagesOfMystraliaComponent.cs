@@ -70,14 +70,6 @@ namespace LiveSplit.MagesOfMystralia
             _timer.InitializeGameTime();
         }
 
-        void gameMemory_OnLevelChanged(object sender, EventArgs e)
-        {
-            if(this.Settings.SplitOnLevelChange)
-            {
-                _timer.Split();
-            }
-        }
-
         void gameMemory_OnFirstLevelLoaded(object sender, EventArgs e)
         {
             if(this.Settings.StartOnFirstLevelLoad)

@@ -1,4 +1,13 @@
 <updates>
+	<update version="1.0.0">
+		<files>
+			<file path="Components/LiveSplit.MagesOfMystralia.dll" status="changed"/>
+		</files>
+		<changelog>
+			<change>Re-added Autostart on Level load.</change>
+			<change>Submitted to LiveSplit.Autosplitters.xml for easy access.</change>
+		</changelog>
+	</update>
 	<update version="0.2.0">
 		<files>
 			<file path="Components/LiveSplit.MagesOfMystralia.dll" status="changed"/>
