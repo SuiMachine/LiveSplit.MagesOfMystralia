@@ -28,4 +28,4 @@ After configuring everything you'll most likely want to turn on game time as pri
 
 Credits
 -------
-  * [SuicideMachine](http://twitch.tv/suicidemachine)
+  * [SuicideMachine](http://twitch.tv/suimachine)
